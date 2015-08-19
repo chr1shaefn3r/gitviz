@@ -15,5 +15,8 @@
     "email": "christophhaefner@web.de",
     "url": "christophhaefner.de"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "graphviz": "0.0.8"
+  }
 }
