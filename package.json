@@ -2,21 +2,25 @@
   "name": "gitviz",
   "version": "0.0.1",
   "description": "Visualizing git internals",
-  "main": "index.js",
-  "repository": {
-    "type": "git",
-    "url": "http://gitlab.christophhaefner.de/node/gitviz.git"
+  "bin": {
+    "gitviz": "cli.js"
   },
-  "keywords": [
-    "git"
-  ],
+  "preferGlobal": true,
   "author": {
     "name": "Christoph Häfner",
     "email": "christophhaefner@web.de",
     "url": "christophhaefner.de"
   },
+  "repository": {
+    "type": "git",
+    "url": "http://gitlab.christophhaefner.de/node/gitviz.git"
+  },
   "license": "MIT",
   "dependencies": {
-    "graphviz": "0.0.8"
-  }
+    "graphviz": "0.0.8",
+    "meow": "^3.3.0"
+  },
+  "keywords": [
+    "git"
+  ]
 }

@@ -1,6 +1,10 @@
 var util = require('util'),
 	graphviz = require('graphviz');
 
+module.exports = function() {
+	console.log("To be implemented ...");
+}
+
 var style = {
 	blob: ["box", "filled", "#ddddff", "#bbbbff"],
 	tree: ["oval", "filled", "#99ff99"],
