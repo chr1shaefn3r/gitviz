@@ -1,9 +1,30 @@
 var util = require('util'),
 	graphviz = require('graphviz');
+var process = require('process');
+var Repo = require('git').Repo,
+	open = require('git-fs-repo');
 
-module.exports = function() {
-	console.log("To be implemented ...");
-}
+module.exports = function(pathToGitRepo) {
+	var path = pathToGitRepo || process.cwd();
+
+	open(path+".git", function(err, repo) {
+		var hashes = repo._refs
+		.map(function(ref) {
+			if(ref.hash) return ref.hash
+		})
+		.filter(function(value) {
+			if(value) return true;
+			return false;
+		});
+		console.log(util.inspect(hashes, {color: true, depth: null}));
+	});
+
+	new Repo(path, hasRepo);
+	function hasRepo(err, repo) {
+		if(err) throw new Error(err);
+	}
+
+};
 
 var style = {
 	blob: ["box", "filled", "#ddddff", "#bbbbff"],
@@ -71,7 +92,7 @@ g.addEdge( ta1, c2 );
 g.addEdge( head, r1 );
 
 // Print the dot script
-console.log( g.to_dot() ); 
+console.log( g.to_dot() );
 
 // Generate a PNG output
 g.output( "png", "test01.png" );
