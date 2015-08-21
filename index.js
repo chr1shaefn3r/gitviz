@@ -1,30 +1,7 @@
 var util = require('util'),
 	graphviz = require('graphviz');
-var process = require('process');
 var Repo = require('git').Repo,
 	open = require('git-fs-repo');
-
-module.exports = function(pathToGitRepo) {
-	var path = pathToGitRepo || process.cwd();
-
-	open(path+".git", function(err, repo) {
-		var hashes = repo._refs
-		.map(function(ref) {
-			if(ref.hash) return ref.hash
-		})
-		.filter(function(value) {
-			if(value) return true;
-			return false;
-		});
-		console.log(util.inspect(hashes, {color: true, depth: null}));
-	});
-
-	new Repo(path, hasRepo);
-	function hasRepo(err, repo) {
-		if(err) throw new Error(err);
-	}
-
-};
 
 var style = {
 	blob: ["box", "filled", "#ddddff", "#bbbbff"],
@@ -41,8 +18,39 @@ var style = {
 	}
 };
 
+module.exports = function(pathToGitRepo) {
+	var path = pathToGitRepo || process.cwd();
+	console.log("Path: "+path);
+
+	var g = graphviz.digraph("G");
+	open(path+"/.git", function(err, repo) {
+		var hashes = repo._refs
+		.map(function(ref) {
+			if(ref.hash) return ref.hash;
+		})
+		.filter(function(value) {
+			if(value) return true;
+			return false;
+		});
+		console.log(util.inspect(hashes, {color: true, depth: null}));
+		hashes.forEach(function(hash) {
+			console.log("hash.substring(0, 4): "+hash.substring(0, 4));
+			var b = g.addNode( hash.substring(0, 4) );
+			style.apply(b, style.blob);
+		});
+
+		console.log( g.to_dot() );
+		g.output( "pdf", "test01.pdf" );
+	});
+
+/*	new Repo(path, hasRepo);
+	function hasRepo(err, repo) {
+		if(err) console.log(err);
+	}*/
+};
+
 // Create digraph G
- var g = graphviz.digraph("G");
+/* var g = graphviz.digraph("G");
 
 // Add blobs
 var b1 = g.addNode( "323f" );
@@ -95,5 +103,4 @@ g.addEdge( head, r1 );
 console.log( g.to_dot() );
 
 // Generate a PNG output
-g.output( "png", "test01.png" );
-
+g.output( "png", "test01.png" );*/
