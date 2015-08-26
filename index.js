@@ -1,15 +1,18 @@
 var util = require('util'),
-	graphviz = require('graphviz');
-var Repo = require('git').Repo,
-	open = require('git-fs-repo');
+	exec = require('child_process').execSync;
+var graphviz = require('graphviz');
+var Repo = require('nodegit').Repository,
+	Obj = require('nodegit').Object;
 
 var style = {
-	blob: ["box", "filled", "#ddddff", "#bbbbff"],
-	tree: ["oval", "filled", "#99ff99"],
-	commit: ["hexagon", "filled", "#ffff99"],
-	reference: ["box", "filled", "#9999ff"],
-	tag: ["box", "filled", "#67fdf3"],
-	head: ["box", "filled", "#ff9999"],
+	types: [ [], /*ext1*/
+		["hexagon", "filled", "#ffff99"], /*commit*/
+		["oval", "filled", "#99ff99"], /*tree*/
+		["box", "filled", "#ddddff", "#bbbbff"], /*blob*/
+		["box", "filled", "#67fdf3"], /*tag*/
+		["box", "filled", "#9999ff"], /*reference*/
+		["box", "filled", "#ff9999"] /*head*/
+	],
 	apply: function(node, style) {
 		node.set("shape", style[0]);
 		node.set("style", style[1]);
@@ -20,87 +23,107 @@ var style = {
 
 module.exports = function(pathToGitRepo) {
 	var path = pathToGitRepo || process.cwd();
-	console.log("Path: "+path);
+//	console.log("Path: "+path);
 
 	var g = graphviz.digraph("G");
-	open(path+"/.git", function(err, repo) {
-		var hashes = repo._refs
-		.map(function(ref) {
-			if(ref.hash) return ref.hash;
+
+	var stringOutput = exec("{\n"+
+						"git rev-list --objects --all\n"+
+						"git rev-list --objects -g --no-walk --all\n"+
+						"git rev-list --objects --no-walk $(git fsck --unreachable | grep '^unreachable commit' | cut -d' ' -f3)\n"+
+						"git rev-list --objects --no-walk $(git fsck --unreachable | grep '^dangling blob' | cut -d' ' -f3)\n"+
+						"} | sort | uniq").toString();
+
+	var ids = stringOutput.split("\n")
+		.map(function(line) {
+			return line.split(" ")[0];
 		})
-		.filter(function(value) {
-			if(value) return true;
-			return false;
+		.filter(function(line) {
+			return line.length > 0;
 		});
-		console.log(util.inspect(hashes, {color: true, depth: null}));
-		hashes.forEach(function(hash) {
-			console.log("hash.substring(0, 4): "+hash.substring(0, 4));
-			var b = g.addNode( hash.substring(0, 4) );
-			style.apply(b, style.blob);
-		});
+//	console.log(ids);
 
-		console.log( g.to_dot() );
-		g.output( "pdf", "test01.pdf" );
+	Repo.open(path)
+	.then(function hasRepo(repo) {
+		ids.forEach(function(id) {
+			Obj.lookup(repo, id, Obj.TYPE.ANY)
+			.then(function(obj) {
+				var n = g.addNode( obj.id().toString().substring(0, 4) );
+				style.apply(n, style.types[obj.type()]);
+//				console.log(obj.id()+" "+obj.type());
+				if(obj.type() == Obj.TYPE.TREE) {
+					repo.getTree(obj.id().toString())
+					.then(function(tree) {
+						tree.entries().forEach(function(treeEntry) {
+							g.addEdge( tree.id().toString().substring(0, 4), treeEntry.sha().substring(0, 4) );
+							g.output( "pdf", "git-internals.pdf" );
+						});
+					})
+					.catch(function(err) {
+						if(err) console.log(err);
+					});
+				} else if(obj.type() == Obj.TYPE.COMMIT) {
+					repo.getCommit(obj.id().toString())
+					.then(function(commit) {
+						commit.getTree()
+						.then(function(tree){
+							g.addEdge( commit.id().toString().substring(0, 4), tree.id().toString().substring(0, 4) );
+							g.output( "pdf", "git-internals.pdf" );
+						})
+						.catch(function(err) {
+							if(err) console.log(err);
+						});
+						commit.parents()
+						.forEach(function(id) {
+							g.addEdge( commit.id().toString().substring(0, 4), id.toString().substring(0, 4) );
+							g.output( "pdf", "git-internals.pdf" );
+						});
+						g.output( "pdf", "git-internals.pdf" );
+					})
+					.catch(function(err) {
+						if(err) {
+							console.log("Repo.getCommit");
+							console.log(err);
+						}
+					});
+				}
+				g.output( "pdf", "git-internals.pdf" );
+			})
+			.catch(function(err) {
+				if(err) {
+					console.log("Obj.lookup");
+					console.log(err);
+				}
+			});
+		});
+		repo.head()
+		.then(function(reference) {
+			var head = g.addNode( "HEAD" );
+			style.apply(head, style.types[6]);
+			g.addEdge( head, reference.target().toString().substring(0, 4) );
+			g.output( "pdf", "git-internals.pdf" );
+		});
+		repo.getReferences()
+		.then(function(arrayReferences) {
+			arrayReferences.forEach(function(reference) {
+				var r = g.addNode( reference.name() );
+				if(reference.isTag() === 1) {
+					style.apply(r, style.types[4]);
+				} else {
+					style.apply(r, style.types[5]);
+				}
+				g.addEdge( r, reference.target().toString().substring(0, 4) );
+				g.output( "pdf", "git-internals.pdf" );
+			});
+		});
+	})
+	.catch(function(err) {
+		if(err) {
+			console.log("Repo.open");
+			console.log(err);
+		}
 	});
-
-/*	new Repo(path, hasRepo);
-	function hasRepo(err, repo) {
-		if(err) console.log(err);
-	}*/
+	console.log( g.to_dot() );
+	g.output( "pdf", "git-internals.pdf" );
 };
 
-// Create digraph G
-/* var g = graphviz.digraph("G");
-
-// Add blobs
-var b1 = g.addNode( "323f" );
-style.apply(b1, style.blob);
-var b2 = g.addNode( "70c3" );
-style.apply(b2, style.blob);
-
-// Add trees
-var t1 = g.addNode( "d52a" );
-style.apply(t1, style.tree);
-var t2 = g.addNode( "edb0" );
-style.apply(t2, style.tree);
-
-// Add commits
-var c1 = g.addNode( "4b3e" );
-style.apply(c1, style.commit);
-var c2 = g.addNode( "bdcf" );
-style.apply(c2, style.commit);
-
-// Add tags
-var ta1 = g.addNode( "67a8" );
-style.apply(ta1, style.tag);
-
-// Add refs
-var r1 = g.addNode( "refs/heads/master" );
-style.apply(r1, style.reference);
-var r2 = g.addNode( "refs/tags/rc1" );
-style.apply(r2, style.reference);
-
-// Add HEAD
-var head = g.addNode( "HEAD" );
-style.apply(head, style.head);
-
-// Add edges between nodes
-var e1 = g.addEdge( t1, b1 );
-e1.set( "label", "stuff.txt" );
-var e2 = g.addEdge( t2, b2 );
-e2.set( "label", "foobar.txt" );
-var e3 = g.addEdge( t2, b1 );
-e3.set( "label", "stuff" );
-g.addEdge( c1, t1 );
-g.addEdge( c2, c1 );
-g.addEdge( c2, t2 );
-g.addEdge( r1, c1 );
-g.addEdge( r2, ta1 );
-g.addEdge( ta1, c2 );
-g.addEdge( head, r1 );
-
-// Print the dot script
-console.log( g.to_dot() );
-
-// Generate a PNG output
-g.output( "png", "test01.png" );*/

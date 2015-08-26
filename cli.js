@@ -14,5 +14,5 @@ var cli = meow({
 	].join('\n')
 });
 
-gitviz();
+gitviz(cli.input[0]);
 

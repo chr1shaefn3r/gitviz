@@ -17,11 +17,9 @@
   },
   "license": "MIT",
   "dependencies": {
-    "git": "^0.1.5",
-    "git-fs-repo": "0.0.5",
-    "git-list-objects": "0.0.2",
     "graphviz": "0.0.8",
-    "meow": "^3.3.0"
+    "meow": "^3.3.0",
+    "nodegit": "^0.4.1"
   },
   "keywords": [
     "git"
