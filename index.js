@@ -27,12 +27,7 @@ module.exports = function(pathToGitRepo) {
 
 	var g = graphviz.digraph("G");
 
-	var stringOutput = exec("{\n"+
-						"git rev-list --objects --all\n"+
-						"git rev-list --objects -g --no-walk --all\n"+
-						"git rev-list --objects --no-walk $(git fsck --unreachable | grep '^unreachable commit' | cut -d' ' -f3)\n"+
-						"git rev-list --objects --no-walk $(git fsck --unreachable | grep '^dangling blob' | cut -d' ' -f3)\n"+
-						"} | sort | uniq").toString();
+	var stringOutput = exec("find .git/objects/ | egrep '[0-9a-f]{38}' | perl -pe 's:^.*([0-9a-f][0-9a-f])/([0-9a-f]{38}):\\1\\2:';").toString();
 
 	var ids = stringOutput.split("\n")
 		.map(function(line) {
