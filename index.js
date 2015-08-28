@@ -25,82 +25,50 @@ module.exports = function(pathToGitRepo) {
 	var path = pathToGitRepo || process.cwd();
 //	console.log("Path: "+path);
 
+	Repo.open(path)
+	.then(visualize)
+	.catch(function(err) {
+		if(err) {
+			console.log("Repo.open");
+			console.log(err);
+		}
+	});
+};
+
+function visualize(repo) {
 	var g = graphviz.digraph("G");
 
 	var stringOutput = exec("find .git/objects/ | egrep '[0-9a-f]{38}' | perl -pe 's:^.*([0-9a-f][0-9a-f])/([0-9a-f]{38}):\\1\\2:';").toString();
 
-	var ids = stringOutput.split("\n")
-		.map(function(line) {
-			return line.split(" ")[0];
-		})
-		.filter(function(line) {
-			return line.length > 0;
-		});
-//	console.log(ids);
-
-	Repo.open(path)
-	.then(function hasRepo(repo) {
-		ids.forEach(function(id) {
-			Obj.lookup(repo, id, Obj.TYPE.ANY)
-			.then(function(obj) {
-				var n = g.addNode( obj.id().toString().substring(0, 4) );
-				style.apply(n, style.types[obj.type()]);
-//				console.log(obj.id()+" "+obj.type());
-				if(obj.type() == Obj.TYPE.TREE) {
-					repo.getTree(obj.id().toString())
-					.then(function(tree) {
-						tree.entries().forEach(function(treeEntry) {
-							g.addEdge( tree.id().toString().substring(0, 4), treeEntry.sha().substring(0, 4) );
-							g.output( "pdf", "git-internals.pdf" );
-						});
-					})
-					.catch(function(err) {
-						if(err) console.log(err);
-					});
-				} else if(obj.type() == Obj.TYPE.COMMIT) {
-					repo.getCommit(obj.id().toString())
-					.then(function(commit) {
-						commit.getTree()
-						.then(function(tree){
-							g.addEdge( commit.id().toString().substring(0, 4), tree.id().toString().substring(0, 4) );
-							g.output( "pdf", "git-internals.pdf" );
-						})
-						.catch(function(err) {
-							if(err) console.log(err);
-						});
-						commit.parents()
-						.forEach(function(id) {
-							g.addEdge( commit.id().toString().substring(0, 4), id.toString().substring(0, 4) );
-							g.output( "pdf", "git-internals.pdf" );
-						});
-						g.output( "pdf", "git-internals.pdf" );
-					})
-					.catch(function(err) {
-						if(err) {
-							console.log("Repo.getCommit");
-							console.log(err);
-						}
-					});
-				}
-				g.output( "pdf", "git-internals.pdf" );
-			})
-			.catch(function(err) {
-				if(err) {
-					console.log("Obj.lookup");
-					console.log(err);
-				}
-			});
-		});
-		repo.head()
+	arrayify(stringOutput)
+	.then(function(ids) {
+		return Promise.all(ids.map(function(id) {
+			return Obj.lookup(repo, id, Obj.TYPE.ANY);
+		}));
+	})
+	.then(function(objects) {
+		return Promise.all(objects.map(function(obj) {
+			var n = g.addNode( obj.id().toString().substring(0, 4) );
+			style.apply(n, style.types[obj.type()]);
+			addEdge = addEdgeForSpecific[obj.type()];
+			if(addEdge) {
+				return addEdge.processOn(obj, repo, g);
+			}
+		}));
+	})
+	.then(function() {
+		return repo.head()
 		.then(function(reference) {
 			var head = g.addNode( "HEAD" );
 			style.apply(head, style.types[6]);
 			g.addEdge( head, reference.target().toString().substring(0, 4) );
-			g.output( "pdf", "git-internals.pdf" );
 		});
-		repo.getReferences()
+	})
+	.then(function() {
+		return repo.getReferences()
 		.then(function(arrayReferences) {
-			arrayReferences.forEach(function(reference) {
+			for(var i=0; i < arrayReferences.length; i++) {
+				var reference = arrayReferences[i];
 				var r = g.addNode( reference.name() );
 				if(reference.isTag() === 1) {
 					style.apply(r, style.types[4]);
@@ -108,17 +76,70 @@ module.exports = function(pathToGitRepo) {
 					style.apply(r, style.types[5]);
 				}
 				g.addEdge( r, reference.target().toString().substring(0, 4) );
-				g.output( "pdf", "git-internals.pdf" );
-			});
+			}
 		});
+	})
+	.then(function() {
+		g.output( "pdf", "git-internals.pdf" );
 	})
 	.catch(function(err) {
 		if(err) {
-			console.log("Repo.open");
+			console.log("Big new awesome promise chain");
 			console.log(err);
+			console.error('You had an error: ', err.stack);
 		}
 	});
-	console.log( g.to_dot() );
-	g.output( "pdf", "git-internals.pdf" );
-};
+}
 
+function arrayify(idsAsString) {
+	return new Promise(function(resolve, reject) {
+		if(idsAsString.length <= 0) {
+			reject("Ids was empty");
+		}
+
+		resolve(idsAsString.split("\n")
+		.map(function(line) {
+			return line.split(" ")[0];
+		})
+		.filter(function(line) {
+			return line.length > 0;
+		}));
+	});
+}
+
+var addEdgeForSpecific = [
+	undefined, /*ext1*/
+	{ processOn: function(obj, repo, g) {
+		return Promise.all([
+			new Promise(function(resolve) {
+				repo.getCommit(obj.id().toString())
+				.then(function(commit) {
+					commit.getTree()
+					.then(function(tree){
+						g.addEdge( commit.id().toString().substring(0, 4), tree.id().toString().substring(0, 4) );
+						resolve();
+					});
+				});
+			}),
+			new Promise(function(resolve) {
+				repo.getCommit(obj.id().toString())
+				.then(function(commit) {
+					for(var i=0; i < commit.parents().length; i++) {
+						var id = commit.parents()[i];
+						g.addEdge( commit.id().toString().substring(0, 4), id.toString().substring(0, 4) );
+					}
+					resolve();
+				});
+			}),
+		]);
+	}}, /*commit*/
+	{ processOn: function(obj, repo, g) {
+		return repo.getTree(obj.id().toString())
+		.then(function(tree) {
+			for(var i=0; i < tree.entries().length; i++) {
+				var treeEntry = tree.entries()[i];
+				g.addEdge( tree.id().toString().substring(0, 4), treeEntry.sha().substring(0, 4) );
+			}
+		});
+	}} /*tree*/
+];
