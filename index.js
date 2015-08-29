@@ -91,20 +91,15 @@ function visualize(repo) {
 	})
 	.catch(function(err) {
 		if(err) {
-			console.log("Big new awesome promise chain");
-			console.log(err);
-			console.error('You had an error: ', err.stack);
+			log(err.stack);
 		}
 	});
 }
 
 function arrayify(idsAsString, g) {
-	if(idsAsString.length <= 0) {
-		g.output( "pdf", "git-internals.pdf" );
-		throw new Error("No ids yet.");
-	}
 	return new Promise(function(resolve, reject) {
 		if(idsAsString.length <= 0) {
+			g.output( "pdf", "git-internals.pdf" );
 			reject("Ids was empty");
 		}
 
