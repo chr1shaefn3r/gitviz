@@ -62,6 +62,13 @@ function visualize(repo) {
 			var head = g.addNode( "HEAD" );
 			style.apply(head, style.types[6]);
 			g.addEdge( head, reference.target().toString().substring(0, 4) );
+		})
+		.catch(function(err) {
+			if(err) {
+				console.log("Repo.head");
+				console.log(err);
+				console.error('You had an error: ', err.stack);
+			}
 		});
 	})
 	.then(function() {
