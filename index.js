@@ -40,7 +40,7 @@ function visualize(repo) {
 
 	var stringOutput = exec("find .git/objects/ | egrep '[0-9a-f]{38}' | perl -pe 's:^.*([0-9a-f][0-9a-f])/([0-9a-f]{38}):\\1\\2:';").toString();
 
-	arrayify(stringOutput)
+	arrayify(stringOutput, g)
 	.then(function(ids) {
 		return Promise.all(ids.map(function(id) {
 			return Obj.lookup(repo, id, Obj.TYPE.ANY);
@@ -91,7 +91,11 @@ function visualize(repo) {
 	});
 }
 
-function arrayify(idsAsString) {
+function arrayify(idsAsString, g) {
+	if(idsAsString.length <= 0) {
+		g.output( "pdf", "git-internals.pdf" );
+		throw new Error("No ids yet.");
+	}
 	return new Promise(function(resolve, reject) {
 		if(idsAsString.length <= 0) {
 			reject("Ids was empty");
