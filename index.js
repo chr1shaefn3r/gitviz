@@ -26,7 +26,7 @@ module.exports = function(pathToGitRepo) {
 	log("use '"+path+"' as path");
 
 	Repo.open(path)
-	.then(visualize)
+	.then(visualize.bind(null, path))
 	.catch(function(err) {
 		if(err) {
 			console.error("Failed to open '"+path+"' as git repository.");
@@ -35,10 +35,10 @@ module.exports = function(pathToGitRepo) {
 	});
 };
 
-function visualize(repo) {
+function visualize(path, repo) {
 	var g = graphviz.digraph("G");
 
-	var stringOutput = exec("find .git/objects/ | egrep '[0-9a-f]{38}' | perl -pe 's:^.*([0-9a-f][0-9a-f])/([0-9a-f]{38}):\\1\\2:';").toString();
+	var stringOutput = exec("find "+path+".git/objects/ | egrep '[0-9a-f]{38}' | perl -pe 's:^.*([0-9a-f][0-9a-f])/([0-9a-f]{38}):\\1\\2:';").toString();
 
 	arrayify(stringOutput, g)
 	.then(function(ids) {
