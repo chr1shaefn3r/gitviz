@@ -5,6 +5,10 @@
   "bin": {
     "gitviz": "cli.js"
   },
+  "files": [
+    "index.js",
+    "cli.js"
+  ],
   "preferGlobal": true,
   "author": {
     "name": "Christoph Häfner",
@@ -15,6 +19,9 @@
     "type": "git",
     "url": "http://gitlab.christophhaefner.de/node/gitviz.git"
   },
+  "bugs": {
+    "url": "http://gitlab.christophhaefner.de/node/gitviz/issues"
+  },
   "license": "MIT",
   "dependencies": {
     "debug": "^2.2.0",
@@ -23,6 +30,11 @@
     "nodegit": "^0.4.1"
   },
   "keywords": [
-    "git"
+    "gitviz",
+    "git",
+    "visualization",
+    "internals",
+    "cli",
+    "command-line"
   ]
 }
