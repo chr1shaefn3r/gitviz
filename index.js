@@ -1,4 +1,4 @@
-var util = require('util'),
+var log = require('debug')("gitviz"),
 	exec = require('child_process').execSync;
 var graphviz = require('graphviz');
 var Repo = require('nodegit').Repository,
@@ -23,14 +23,14 @@ var style = {
 
 module.exports = function(pathToGitRepo) {
 	var path = pathToGitRepo || process.cwd();
-//	console.log("Path: "+path);
+	log("use '"+path+"' as path");
 
 	Repo.open(path)
 	.then(visualize)
 	.catch(function(err) {
 		if(err) {
-			console.log("Repo.open");
-			console.log(err);
+			console.error("Failed to open '"+path+"' as git repository.");
+			console.error(err);
 		}
 	});
 };
@@ -42,6 +42,7 @@ function visualize(repo) {
 
 	arrayify(stringOutput, g)
 	.then(function(ids) {
+		log("found following ids: ", ids);
 		return Promise.all(ids.map(function(id) {
 			return Obj.lookup(repo, id, Obj.TYPE.ANY);
 		}));
@@ -50,6 +51,7 @@ function visualize(repo) {
 		return Promise.all(objects.map(function(obj) {
 			var n = g.addNode( obj.id().toString().substring(0, 4) );
 			style.apply(n, style.types[obj.type()]);
+			log("added '"+obj.id().toString()+"' with type '"+obj.type()+"'");
 			addEdge = addEdgeForSpecific[obj.type()];
 			if(addEdge) {
 				return addEdge.processOn(obj, repo, g);
@@ -62,12 +64,11 @@ function visualize(repo) {
 			var head = g.addNode( "HEAD" );
 			style.apply(head, style.types[6]);
 			g.addEdge( head, reference.target().toString().substring(0, 4) );
+			log("added HEAD, pointing to '"+reference.target().toString()+"'");
 		})
 		.catch(function(err) {
 			if(err) {
-				console.log("Repo.head");
-				console.log(err);
-				console.error('You had an error: ', err.stack);
+				log("repo.head() threw an error: ", err.stack);
 			}
 		});
 	})
@@ -79,8 +80,10 @@ function visualize(repo) {
 				var r = g.addNode( reference.name() );
 				if(reference.isTag() === 1) {
 					style.apply(r, style.types[4]);
+					log("added tag '"+reference.name()+"', pointing to '"+reference.target().toString()+"'");
 				} else {
 					style.apply(r, style.types[5]);
+					log("added reference '"+reference.name()+"', pointing to '"+reference.target().toString()+"'");
 				}
 				g.addEdge( r, reference.target().toString().substring(0, 4) );
 			}
