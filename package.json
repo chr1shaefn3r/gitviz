@@ -1,6 +1,6 @@
 {
   "name": "gitviz",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Visualizing git internals",
   "bin": {
     "gitviz": "cli.js"
