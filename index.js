@@ -38,7 +38,7 @@ module.exports = function(pathToGitRepo) {
 function visualize(path, repo) {
 	var g = graphviz.digraph("G");
 
-	var stringOutput = exec("find "+path+".git/objects/ | egrep '[0-9a-f]{38}' | perl -pe 's:^.*([0-9a-f][0-9a-f])/([0-9a-f]{38}):\\1\\2:';").toString();
+	var stringOutput = exec("find "+path+"/.git/objects/ | egrep '[0-9a-f]{38}' | perl -pe 's:^.*([0-9a-f][0-9a-f])/([0-9a-f]{38}):\\1\\2:';").toString();
 
 	arrayify(stringOutput, g)
 	.then(function(ids) {
