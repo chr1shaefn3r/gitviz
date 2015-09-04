@@ -36,5 +36,9 @@
     "internals",
     "cli",
     "command-line"
-  ]
+  ],
+  "scripts": {
+	"test": "bash tests/e2e.bash",
+	"preversion": "npm test"
+  }
 }
