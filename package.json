@@ -20,7 +20,8 @@
     "url": "http://gitlab.christophhaefner.de/node/gitviz.git"
   },
   "bugs": {
-    "url": "https://github.com/chr1shaefn3r/gitviz/issues"
+    "url": "https://github.com/chr1shaefn3r/gitviz/issues",
+    "email": "christophhaefner@web.de"
   },
   "license": "MIT",
   "dependencies": {
