@@ -7,7 +7,7 @@
 ## CLI
 
 ```sh
-$ npm install --global crunch-css
+$ npm install --global gitviz
 ```
 
 ```sh
