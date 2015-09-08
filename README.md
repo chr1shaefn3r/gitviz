@@ -2,7 +2,7 @@
 
 >  Visualizing git internals
 
-![] (examples/simple.png)
+![] (sample.gif)
 
 ## CLI
 
