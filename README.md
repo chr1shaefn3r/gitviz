@@ -1,4 +1,4 @@
-# Graphviz
+# Gitviz
 
 >  Visualizing git internals
 
