@@ -147,7 +147,8 @@ var addEdgeForSpecific = [
 		.then(function(tree) {
 			for(var i=0; i < tree.entries().length; i++) {
 				var treeEntry = tree.entries()[i];
-				g.addEdge( tree.id().toString().substring(0, 4), treeEntry.sha().substring(0, 4) );
+				g.addEdge( tree.id().toString().substring(0, 4), treeEntry.sha().substring(0, 4) )
+					.set("label", treeEntry.toString());
 			}
 		});
 	}} /*tree*/
