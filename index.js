@@ -151,5 +151,12 @@ var addEdgeForSpecific = [
 					.set("label", treeEntry.toString());
 			}
 		});
-	}} /*tree*/
+	}}, /*tree*/
+	undefined, /*blob*/
+	{ processOn: function(obj, repo, g) {
+		return repo.getTag(obj.id().toString())
+		.then(function(tag) {
+			g.addEdge( obj.id().toString().substring(0, 4), tag.targetId().toString().substring(0, 4) );
+		});
+	}} /*tag*/
 ];

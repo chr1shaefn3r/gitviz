@@ -9,7 +9,12 @@ function m_arrow() { echo -e " \033[1;33m➜\033[0m $@"; }
 function commit() {
 	GIT_AUTHOR_DATE="Fri Sep 13 10:10:10 2015 +0200" \
 		GIT_COMMITTER_DATE="Fri Sep 13 10:10:10 2015 +0200" \
-		git commit  --author "Christoph Haefner <chr1shaefn3r@christophhaefner.de>" -m $1 1> /dev/null
+		git commit --author "Christoph Haefner <chr1shaefn3r@christophhaefner.de>" -m $1 1> /dev/null
+}
+function annotated_tag() {
+	GIT_AUTHOR_DATE="Fri Sep 13 10:10:10 2015 +0200" \
+		GIT_COMMITTER_DATE="Fri Sep 13 10:10:10 2015 +0200" \
+		git tag --annotate --message "Hello, World!" $1 HEAD 1> /dev/null
 }
 function assert() {
 	cmp "git-internals.pdf" "../../comparedata/"$1".pdf" &> /dev/null
@@ -66,4 +71,8 @@ assert two_commit
 git tag v1
 $GITVIZ
 assert tag
+
+annotated_tag v2
+$GITVIZ
+assert tag_annotated
 
