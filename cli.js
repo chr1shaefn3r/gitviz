@@ -9,6 +9,10 @@ var cli = meow({
 		'Usage:',
 		'  gitviz PATH',
 		'',
+		'Options:',
+		'  -h, --help         print usage information',
+		'  -v, --version      show version info and exit',
+		'',
 		'Examples:',
 		'  $ gitviz /path/to/git/project',
 	].join('\n')
