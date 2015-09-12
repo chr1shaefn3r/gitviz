@@ -21,10 +21,7 @@ var style = {
 	}
 };
 
-module.exports = function(pathToGitRepo) {
-	var path = pathToGitRepo || process.cwd();
-	log("use '"+path+"' as path");
-
+module.exports = function(path) {
 	Repo.open(path)
 	.then(visualize.bind(null, path))
 	.catch(function(err) {
