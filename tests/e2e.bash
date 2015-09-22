@@ -23,6 +23,7 @@ function assert() {
 	else
 		m_success "Test "$1" passed :)"
 	fi
+	cp "git-internals.pdf" $1".pdf"
 }
 
 
