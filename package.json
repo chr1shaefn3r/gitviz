@@ -40,7 +40,7 @@
     "command-line"
   ],
   "scripts": {
-    "test": "bash tests/e2e.bash && bash tests/e2e-watch.bash",
+    "test": "bash tests/e2e.bash",
     "preversion": "npm test"
   }
 }
