@@ -19,6 +19,7 @@ $ gitviz --help
     gitviz PATH
 
   Options:
+	-w, --watch        watch the PATH for filechanges
     -h, --help         print usage information
     -v, --version      show version info and exit
 
@@ -28,6 +29,9 @@ $ gitviz --help
 
 ## External dependencies
  * Graphviz (sudo apt-get install graphviz)
+
+# Open issues
+ * Add pack-support
 
 ## License
 
