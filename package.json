@@ -1,6 +1,6 @@
 {
   "name": "gitviz",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Visualizing git internals",
   "bin": {
     "gitviz": "cli.js"
@@ -43,6 +43,6 @@
   "scripts": {
     "test": "bash tests/e2e.bash",
     "preversion": "npm test",
-	"generate-sample-gif": "bash scripts/generate_sample_gif.bash"
+    "generate-sample-gif": "bash scripts/generate_sample_gif.bash"
   }
 }
