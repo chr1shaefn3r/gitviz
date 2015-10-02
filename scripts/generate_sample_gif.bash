@@ -23,17 +23,20 @@ git init $TEMP_GIT
 cd $TEMP_GIT
 set +e
 
-# test cases
-
 $GITVIZ
 
 echo "Hello, World!" | git hash-object -w --stdin 1> /dev/null
+# Should return 8ab686eafeb1f44702738c8b0f24f2567c36da6d
 $GITVIZ
 cp git-internals.png "../one_blob.png"
 
 echo "Hello, World!!" | git hash-object -w --stdin 1> /dev/null
 $GITVIZ
 cp git-internals.png "../two_blob.png"
+
+git mktree < ../../../scripts/tree_data
+$GITVIZ
+cp git-internals.png "../one_tree.png"
 
 echo "Hello, World!" > hello.txt
 git add hello.txt
@@ -63,5 +66,5 @@ cp git-internals.png "../tag_annotated.png"
 
 cd ..
 mogrify -background white -gravity Center -extent 483x707 *.png
-convert -delay 150 -loop 0 one_blob.png two_blob.png one_commit.png two_commit.png tag.png three_commit.png tag_annotated.png sample.gif
+convert -delay 150 -loop 0 one_blob.png two_blob.png one_tree.png one_commit.png two_commit.png tag.png three_commit.png tag_annotated.png sample.gif
 

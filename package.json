@@ -42,6 +42,7 @@
   ],
   "scripts": {
     "test": "bash tests/e2e.bash",
-    "preversion": "npm test"
+    "preversion": "npm test",
+	"generate-sample-gif": "bash scripts/generate_sample_gif.bash"
   }
 }
