@@ -31,7 +31,6 @@
     "graphviz": "0.0.8",
     "meow": "^3.4.2",
     "nodegit": "^0.5.0",
-    "npm-check-updates": "^2.3.4",
     "watch": "^0.16.0"
   },
   "keywords": [
@@ -44,7 +43,11 @@
   ],
   "scripts": {
     "test": "bash tests/e2e.bash",
-    "preversion": "npm test",
+    "preversion": "npm test && snyk test",
     "generate-sample-gif": "bash scripts/generate_sample_gif.bash"
+  },
+  "devDependencies": {
+    "npm-check-updates": "^2.5.8",
+    "snyk": "^1.9.1"
   }
 }
