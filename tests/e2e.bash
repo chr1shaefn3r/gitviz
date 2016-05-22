@@ -18,7 +18,7 @@ function annotated_tag() {
 }
 function assert() {
 	cmp "git-internals.pdf" "../../comparedata/"$1".pdf" &> /dev/null
-	if [ $? -eq 1 ]; then
+	if [ $? -ne 0 ]; then
 		m_error "Test "$1" failed :("
 	else
 		m_success "Test "$1" passed :)"
