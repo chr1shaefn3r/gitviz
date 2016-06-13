@@ -28,10 +28,11 @@ $ gitviz --help
 ```
 
 ## External dependencies
- * Graphviz (sudo apt-get install graphviz)
+ * Graphviz (sudo apt-get install graphviz or brew install graphviz)
 
 # Open issues
  * Add pack-support
+ * Catch the exception if graphviz is not installed and give useful hint on how to solve the problem
 
 ## License
 
