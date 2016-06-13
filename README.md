@@ -36,5 +36,5 @@ $ gitviz --help
 
 ## License
 
-MIT © [Christoph Häfner](http://christophhaefner.de)
+MIT © [Christoph Häfner](https://christophhaefner.de)
 
