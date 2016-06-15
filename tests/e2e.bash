@@ -63,7 +63,7 @@ commit "Initial"
 $GITVIZ
 assert one_commit
 
-echo "Hello, World!" >> hello.txt
+echo "Hello, World!!" > hello.txt
 git add hello.txt
 commit "Second"
 $GITVIZ
