@@ -1,6 +1,6 @@
 # Gitviz
 
->  Visualizing git internals
+>  Visualizing the git object database
 
 ![] (sample.gif)
 
@@ -13,7 +13,7 @@ $ npm install --global gitviz
 ```sh
 $ gitviz --help
 
-  Visualizing git internals
+  Visualizing the git object database
 
   Usage:
     gitviz PATH
