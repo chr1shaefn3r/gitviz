@@ -13,17 +13,10 @@
   "preferGlobal": true,
   "author": {
     "name": "Christoph Häfner",
-    "email": "christophhaefner@web.de",
+    "email": "npm.christoph.haefner@mailbox.org",
     "url": "christophhaefner.de"
   },
-  "repository": {
-    "type": "git",
-    "url": "http://gitlab.christophhaefner.de/node/gitviz.git"
-  },
-  "bugs": {
-    "url": "https://github.com/chr1shaefn3r/gitviz/issues",
-    "email": "christophhaefner@web.de"
-  },
+  "repository": "chr1shaefn3r/gitviz.git",
   "license": "MIT",
   "dependencies": {
     "debug": "^2.2.0",
