@@ -1,6 +1,6 @@
 {
   "name": "gitviz",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Visualizing the git object database",
   "bin": {
     "gitviz": "cli.js"
