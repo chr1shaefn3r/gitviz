@@ -13,8 +13,8 @@
   "preferGlobal": true,
   "author": {
     "name": "Christoph Häfner",
-    "email": "npm.christoph.haefner@mailbox.org",
-    "url": "christophhaefner.de"
+    "email": "npm@christophhaefner.de",
+    "url": "https://christophhaefner.de"
   },
   "repository": "chr1shaefn3r/gitviz.git",
   "license": "MIT",
