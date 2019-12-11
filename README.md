@@ -2,7 +2,7 @@
 
 >  Visualizing the git object database
 
-![] (sample.gif)
+![](sample.gif)
 
 ## CLI
 
